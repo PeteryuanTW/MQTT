@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
+
+using System.Net;
 using System.Threading.Tasks;
 using MQTTnet;
 using MQTTnet.Server;
@@ -22,7 +24,7 @@ namespace MQTT
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             await MqttAsync();
-            Application.Run(new InitForm());
+            //Application.Run(new InitForm());
         }
 
         private static async Task MqttAsync()
@@ -31,6 +33,16 @@ namespace MQTT
             var mqttServer = new MqttFactory().CreateMqttServer();
             await mqttServer.StartAsync(optionsBuilder.Build());
 
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            string ipHeader = "";
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    ipHeader += ip.ToString() + " ";
+                }
+            }
+
             mqttServer.ApplicationMessageReceivedHandler = new MqttApplicationMessageReceivedHandlerDelegate(e =>
             {
                 Console.WriteLine($"{e.ClientId} publish {Encoding.UTF8.GetString(e.ApplicationMessage.Payload ?? new byte[0])} at {e.ApplicationMessage.Topic}");
@@ -38,12 +50,14 @@ namespace MQTT
 
             mqttServer.ClientConnectedHandler = new MqttServerClientConnectedHandlerDelegate(e =>
             {
-                Console.WriteLine($"{e.ClientId} connect！");
+                Console.WriteLine($"{e.ClientId} connect at {DateTime.Now}");
             });
             mqttServer.ClientDisconnectedHandler = new MqttServerClientDisconnectedHandlerDelegate(e =>
             {
-                Console.WriteLine($"{e.ClientId} disconnect！");
+                Console.WriteLine($"{e.ClientId} disconnect at {DateTime.Now}");
             });
+
+            Application.Run(new InitForm(ipHeader));
         }
     }
 }

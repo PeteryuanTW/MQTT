@@ -19,11 +19,16 @@ namespace MQTT
     {
         MqttFactory mqttFactory = new MqttFactory();
         IMqttClient client;
-        private string id;
-        public MQTTForm(string id)
+        private string ip;
+        public MQTTForm(string ip)
         {
             InitializeComponent();
-            this.id = id;
+            this.ip = ip;
+        }
+        public MQTTForm()
+        {
+            InitializeComponent();
+            this.ip = "172.25.90.194";
         }
 
         private void FormLoad(object sender, EventArgs eventArgs)
@@ -38,23 +43,34 @@ namespace MQTT
         }
         private async Task Connect(bool subscribe)
         {
-            client = mqttFactory.CreateMqttClient();
-            var option = new MqttClientOptionsBuilder()
-                .WithClientId(id)
-                .WithTcpServer("172.25.90.107", 1883)
-                .WithCleanSession()
-                .Build();
-
-            client.UseConnectedHandler(e =>
+            try
             {
-                ConnectStatus(true);
-            });
+                client = mqttFactory.CreateMqttClient();
+                string id = Guid.NewGuid().ToString();
+                var option = new MqttClientOptionsBuilder()
+                    .WithClientId(id)
+                    .WithTcpServer(ip, 1883)
+                    .WithCleanSession()
+                    .Build();
+                SetHeaderID(id+"<--->"+ip);
+                client.UseConnectedHandler(e =>
+                {
+                    ConnectStatus(true);
+                });
 
-            client.UseDisconnectedHandler(e =>
+                client.UseDisconnectedHandler(e =>
+                {
+                    ConnectStatus(false);
+                });
+                await client.ConnectAsync(option);
+            }
+            catch (Exception ex)
             {
-                ConnectStatus(false);
-            });
-            await client.ConnectAsync(option);
+                Console.WriteLine(ex);
+            }
+
+            
+            
         }
         #region Click
         private void SubscribeClick(object sender, EventArgs e)
@@ -195,6 +211,22 @@ namespace MQTT
                 tb_content.Text = "";
             }
         }
+
+        private void SetHeaderID(string id)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() =>
+                {
+                    this.Text = id;
+                }));
+            }
+            else
+            {
+                this.Text = id;
+            }
+        }
+        
         #endregion
     }
 }

@@ -12,15 +12,26 @@ namespace MQTT
 {
     public partial class InitForm : Form
     {
-        public InitForm()
+        public InitForm(string ip)
         {
             InitializeComponent();
+            this.Text = ip;
         }
 
         private void btn_init_Click(object sender, EventArgs e)
         {
-            MQTTForm mqttForm = new MQTTForm(tb_name.Text);
-            mqttForm.Show();
+            if (tb_ip.Text.Trim() == "")
+            {
+                MQTTForm mqttForm = new MQTTForm();
+                mqttForm.Show();
+            }
+            else
+            {
+
+                MQTTForm mqttForm = new MQTTForm(tb_ip.Text);
+                mqttForm.Show();
+            }
+            
         }
     }
 }
