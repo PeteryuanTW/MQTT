@@ -25,11 +25,6 @@ namespace MQTT
             InitializeComponent();
             this.ip = ip;
         }
-        public MQTTForm()
-        {
-            InitializeComponent();
-            this.ip = "172.25.90.194";
-        }
 
         private void FormLoad(object sender, EventArgs eventArgs)
         {

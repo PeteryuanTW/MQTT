@@ -29,6 +29,7 @@ namespace MQTT
 
         private static async Task MqttAsync()
         {
+            Console.WriteLine("service starting...");
             var optionsBuilder = new MqttServerOptionsBuilder().WithConnectionBacklog(100).WithDefaultEndpointPort(1883);
             var mqttServer = new MqttFactory().CreateMqttServer();
             await mqttServer.StartAsync(optionsBuilder.Build());
@@ -56,7 +57,8 @@ namespace MQTT
             {
                 Console.WriteLine($"{e.ClientId} disconnect at {DateTime.Now}");
             });
-
+            Console.WriteLine("service started");
+            Console.WriteLine("service ip: "+ipHeader);
             Application.Run(new InitForm(ipHeader));
         }
     }

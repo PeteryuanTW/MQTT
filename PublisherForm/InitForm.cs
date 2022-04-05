@@ -22,8 +22,7 @@ namespace MQTT
         {
             if (tb_ip.Text.Trim() == "")
             {
-                MQTTForm mqttForm = new MQTTForm();
-                mqttForm.Show();
+                tb_ip.Focus();
             }
             else
             {
